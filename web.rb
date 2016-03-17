@@ -9,7 +9,7 @@ end
 
 get '/env/?' do
   out = ""
-  ENV.each do |k,v|
+  ENV.sort.each do |k,v|
     out += k + ": " + v + "<br/>"
   end
   out
