@@ -4,7 +4,7 @@ require 'dotenv'
 Dotenv.load
 
 get '/?' do
-  "Hello, World!"
+  erb :index
 end
 
 get '/env/?' do

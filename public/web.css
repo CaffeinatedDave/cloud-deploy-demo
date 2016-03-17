@@ -1,0 +1,58 @@
+@font-face {
+  font-family: 'sbgFont';
+  src: url('fonts/Sky_Med.ttf');
+  src:
+      local('SBG Font'),
+      local('SBG-Font'),
+      url('fonts/Sky_Med.ttf'),
+      format("openType");
+}
+
+html, body {
+  font-family: 'sbgFont';
+  background-color: #0d2d6c;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: url('bg.jpg') no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+#topbar {
+  height: 4.5em;
+  vertical-align: middle;
+  text-align: center;
+  margin: auto;
+  font-size: 1.1em;
+  background-color: #0e399b;
+  background-image: -moz-linear-gradient(top,#253f7f 0,#0e399b 50%,#01288a 50%,#015df1 100%);
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#253f7f),color-stop(50%,#0e399b),color-stop(50%,#01288a),color-stop(100%,#015df1));
+  background-image: -webkit-linear-gradient(top,#253f7f 0,#0e399b 50%,#01288a 50%,#015df1 100%);
+  background-image: -o-linear-gradient(top,#253f7f 0,#0e399b 50%,#01288a 50%,#015df1 100%);
+  background-image: -ms-linear-gradient(top,#253f7f 0,#0e399b 50%,#01288a 50%,#015df1 100%);
+  background-image: linear-gradient(to bottom,#253f7f 0,#0e399b 50%,#01288a 50%,#015df1 100%);
+  width: 100%;
+  top: 0;
+  position: fixed;
+}
+
+#logo-img {
+  margin: 1em;
+  height: 2.5em;
+}
+
+#page {
+
+  padding-top: 5em;
+  width:65%;
+  margin: 0 auto;
+  margin-top: 0;
+  background-color: #fff;
+  min-height: 100em;  
+}
