@@ -1,0 +1,9 @@
+#!/bin/bash
+# install ruby
+
+
+# install bundler
+gem install bundler
+
+# install gems
+bundle install
