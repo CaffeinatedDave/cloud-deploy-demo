@@ -1,8 +1,16 @@
 on: 0.0
 os: linux
 files:
-  - source: /index.html
-    destination: /var/www/html/
+  - source: /Gemfile
+    destination: /opt/ruby-app
+  - source: /Gemfile.lock
+    destination: /opt/ruby-app
+  - source: /public
+    destination: /opt/ruby-app/public
+  - source: /views
+    destination: /opt/ruby-app/views
+  - source: /web.rb
+    destination: /opt/ruby-app 
 hooks:
   BeforeInstall:
     - location: scripts/install_dependencies
