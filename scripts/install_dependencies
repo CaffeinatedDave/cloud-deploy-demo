@@ -1,3 +1,12 @@
 #!/bin/bash
+
+# install ruby
+yum install ruby-devel make gcc
+gem update --system
+gem install io-console
+
 # install bundler
 gem install bundler
+
+# install dependencies
+bundle install
