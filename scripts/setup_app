@@ -1,2 +1,2 @@
 # install dependencies
-bundle install
+/usr/local/bin/bundle install
