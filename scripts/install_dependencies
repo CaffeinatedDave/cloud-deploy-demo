@@ -7,6 +7,3 @@ gem install io-console
 
 # install bundler
 gem install bundler
-
-# install dependencies
-bundle install
