@@ -1,1 +1,22 @@
-Hello, World!
+<h1>Deploying to the cloud</h1>
+
+<h2>Heroku</h2>
+
+
+<p>
+To start, ensure you have both git and the <a href="https://toolbelt.heroku.com/" target="_blank">Heroku Toolbelt</a> installed. 
+</p>
+
+<p>
+Sign up at <a href="https://www.heroku.com/">https://www.heroku.com/</a>, and go to the dashboard. Click on the <span class="code">+</span> in the top right corner to create a new app. Change the runtime selection to Europe to get a closer instance. Congratulations. You've already set up your application space.
+</p>
+
+<p>
+Lets go to the terminal. Assuming you have the Heroku Toolbet installed, login with <span class="code">heroku login</span> and set up your ssh keys (see <a href="https://devcenter.heroku.com/articles/keys">for a guide on how to do this</a>).
+</p>
+
+<p>
+Clone this repo into a new directory using <span class="code">git clone https://github.com/CaffeinatedDave/cloud-deploy-demo.git</span>, navigate into this directory and run <span class="code">heroku git:remote -a [your-app-name]</span>. This works on any existing git repo, and is the same as running <span class="code">git remote add heroku [repo]</span>. As such, you can now run <span class="code">git push heroku master</span>, and you push your code to your heroku instance. That's it!
+</p>
+
+<h2>AWS</h2>
