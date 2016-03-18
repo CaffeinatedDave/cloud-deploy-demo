@@ -1,2 +1,4 @@
 #!/bin/bash
+gem install io-console
+cd /opt/ruby-app
 bundle install
