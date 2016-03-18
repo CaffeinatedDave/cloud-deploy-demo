@@ -1,2 +1,3 @@
 #!/bin/bash
-nohup ruby /opt/ruby-app/web.rb
+ruby /opt/ruby-app/web.rb -p 8080 -o 0.0.0.0 >~/ruby-app.log <~/ruby-app.log 2>&1 &
+

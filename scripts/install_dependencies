@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # install ruby
-yum install ruby-devel make gcc
+sudo yum -y install ruby-devel
+sudo yum -y install make
+sudo yum -y install gcc
 gem update --system
-gem install io-console
 
-# install bundler
 gem install bundler
+gem install io-console

@@ -1,5 +1,5 @@
 #!/bin/bash
-isExistApp = `pgrep httpd`
+isExistApp = `pgrep ruby`
 if [[ -n  $isExistApp ]]; then
-    service httpd stop
+    killall -u ec2-user ruby
 fi
