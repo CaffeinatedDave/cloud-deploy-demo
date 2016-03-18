@@ -1,2 +1,2 @@
 #!/bin/bash
-ruby /opt/ruby-app/web.rb
+nohup ruby /opt/ruby-app/web.rb
