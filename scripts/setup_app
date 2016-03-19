@@ -1,2 +1,2 @@
 cd /opt/ruby-app/
-/usr/local/bin/bundle install
+/home/ec2-user/bin/bundle install
