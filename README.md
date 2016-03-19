@@ -1,15 +1,45 @@
 Sheffield Hackathon - Deployment to the Cloud Demo App
 ======================================================
 
-# Deploying to Heroku
-
-TODO
-
-# Deploying to AWS
-
 These instructions are written with the aim of helping people to follow the SkyBet Workshop at HackSheffield.
 
-The intention is to help contestants who wish to host their projects on EC2 get their code reliably and easily deployed to an EC2 instance.
+The intention is to help contestants who wish to host their projects on either EC2 or Heroku get their code reliably and easily deployed to an instance.
+
+# Deploying to Heroku
+
+##Prerequisits
+ - install both git and the Heroku Toolbelt.
+ - Sign up for GitHub and Heroku free accounts
+
+### Step 1 - Set up your Heroku instance
+
+Log into your heroku account at https://www.heroku.com/ and go to the dashboard. Click on the + in the top right corner to create a new app. Change the runtime selection to Europe to get a closer instance. 
+
+Congratulations. You've already set up your application space.
+
+### Step 2 - Set up Heroku Toolbelt
+
+Lets go to the terminal. Assuming you have the Heroku Toolbet installed, login with heroku login and set up your ssh keys (see [here](https://devcenter.heroku.com/articles/keys)  for a guide on how to do this).
+
+### Step 3 - Cloning the example app 
+
+Clone this repo into a new directory using `git clone https://github.com/CaffeinatedDave/cloud-deploy-demo.git`, navigate into this directory and run `heroku git:remote -a [your-app-name]` where your-app-name is defined from step 1. This works on any existing git repo, and is the same as running `git remote add heroku [repo]`. 
+
+### Step 4 - Deployment
+
+Because we've added the Heroku instance as another git remote, you can now run `git push heroku master`, and you push your code to your heroku instance. You can now see it at http://your-app-name.herokuapp.com. You can also see your application logs in the terminal with `heroku logs --tail`
+
+### Step 5 - Add ons and Environment Variables
+
+Find your app in the dashboard, and click through to get more details about it. Click "Add Ons" and search for the one you want - in the demo, we're going for a postgres database. Type Postgres and click on the app, select "Hobby Dev -- Free" and provision it.
+
+In your terminal run `heroku config` - this lists your environment variables. You should see a DATABASE_URL field, complete with your connection string - you can use this in your app the same way you would any other environment variables. Other addons will include their own env variables for you to use as well.
+
+If you wanted to add an env variable manually, you can either do this from your app dashboard, or using `heroku config:set [KEY]=[VALUE]`
+
+*That's it!* - Feel free to PM @CaffeinatedDave on [HackSheffield slack](https://hacksheffield.slack.com), if you're having trouble or want to know anything further
+
+# Deploying to AWS
 
 If you are trying to use this AWS CodeDeploy and are having any trouble pm me(@Conorrr) on the [HackSheffield slack](https://hacksheffield.slack.com).
 
