@@ -20,3 +20,218 @@ Clone this repo into a new directory using <span class="code">git clone https://
 </p>
 
 <h2>AWS</h2>
+<h1 id="deploying-to-aws">Deploying to AWS</h1>
+
+<p>If you are trying to use this AWS CodeDeploy and are having any trouble pm me(@Conorrr) on the <a href="https://hacksheffield.slack.com">HackSheffield slack</a>.</p>
+
+<p>CodeDeploy is generally aimed at users with much more time to develop complex deployment solutions, for the hackathon I have attempted to make use of CodeDeploy to quickly get code reliably deployed.</p>
+
+<p>To make this guide simpler and easier to follow I will be using the web console for all AWS configuration.</p>
+
+<p>The guide may looks quite lengthy but I have attempted to break things down into their most basic steps. It is written assuming that you are using a *nix machine. If you are using windows the majority of the steps should be the same except for the SSH steps which would require a SSH client.</p>
+
+
+
+<h3 id="prerequisites">Prerequisites</h3>
+
+<ul>
+<li>Signed up for GitHub account</li>
+<li>Signed up for an AWS account</li>
+</ul>
+
+
+
+<h2 id="instructions">Instructions</h2>
+
+
+
+<h3 id="step-1-set-up-security-for-ec2-and-codedeploy">Step 1 - Set up security for EC2 and CodeDeploy</h3>
+
+<ul>
+<li><p><strong>Create a Role for EC2</strong> - this appears to be a quirk of CodeDeploy. The EC2 instance doesn’t make use of this Role but CodeDeploy requires that the EC2 instance you wish to deploy to has a role set.</p>
+
+<ul><li>Navigate to <a href="https://eu-west-1.console.aws.amazon.com">https://eu-west-1.console.aws.amazon.com</a></li>
+<li>Firstly we need to setup policies so that CodeDeploy can access our EC2 instance</li>
+<li>Select <em>Identity &amp; Access Management</em></li>
+<li>Select <em>Roles</em> on the left hand side</li>
+<li>Now click the <strong>Create New Role</strong> at the top of the page</li>
+<li>Name the role <em>ec2-cd-role</em></li>
+<li>On the next page select <strong>AWS Service Roles</strong> -&gt; <strong>Amazon EC2</strong></li>
+<li>Select the <strong>AmazonS3ReadOnlyAccess</strong> Policy and click Next Step</li>
+<li>Click Create Role</li></ul></li>
+<li><p><strong>Create a Role for CodeDeploy</strong> - this role is used by CodeDeploy and it is used.</p>
+
+<ul><li>You should’ve been returned to the Roles page, Click the <em>Create New Role</em> button</li>
+<li>Name it <em>cd-role</em></li>
+<li>This time select <strong>AWS CodeDeploy</strong> (you may need to scroll down a bit)</li>
+<li>Select the <strong>AWSCodeDeployRole</strong> policy</li>
+<li>Click <strong>Create role</strong></li></ul></li>
+<li><p><strong>Create KeyPair</strong> - you will need this to securely SSH into the EC2 instance</p>
+
+<ul><li>Return to the AWS dashboard by clicking the AWS logo in the top left of the page, under Compute select <strong>EC2</strong></li>
+<li>Under <em>Network &amp; Security</em> on the left hand side click <strong>Key Pairs</strong></li>
+<li>Click <strong>Create Key Pair</strong> and name it workshop</li>
+<li>This should trigger the download of a file called <em>workshop.pem</em></li>
+<li>Move this pem file to <strong>~/.ssh</strong> you may need to create the directory if it doesn’t already exist. <code>mkdir -p ~/.ssh| mv ~/Downloads/workshop.pem ~/.ssh/workshop.pem</code></li></ul></li>
+</ul>
+
+
+
+<h3 id="step-2-launch-an-ec2-instance">Step 2 - Launch an EC2 instance</h3>
+
+<ul>
+<li>Select <em>Instances</em> on the left hand menu</li>
+<li>Click the <strong>Launch Instance</strong> button at the top of the page</li>
+<li>Select <em>Amazon Linux AMI 2015.09.2</em></li>
+<li>Choose <em>t2.micro</em> and Click <strong>Next: Configure Instance Details</strong> (not Review and Launch)</li>
+<li>Change IAM role to <em>ec2-cd-role</em> and click <strong>Next: Add Storage</strong></li>
+<li>The default selection will do fine, click <strong>Next: Tag Instance</strong></li>
+<li>We need to tag our instance so that it can be identified by CodeDeploy, Give it the name <em>sb-workshop</em> and click <strong>Next: Configure Security Group</strong></li>
+<li>We want to create a new security group with the following rules: (these can be changed later so don’t worry if you mess them up) <br>
+<ul><li>Type: <em>SSH</em> the other fields should be autopopulated</li>
+<li>Type: <em>HTTPS</em> the other fields should be autopopulated</li>
+<li>Type: <em>Custom TCP Rule</em>, Port Range: <em>8080</em>, Source: <em>Anywhere</em></li></ul></li>
+<li>Click <strong>Review and Launch</strong></li>
+<li><p>Your confirm screen should match:</p>
+
+<p><img src="http://i.imgur.com/KonTchq.png" alt="Confirm EC2 Page" title=""></p></li>
+<li><p>When you click <strong>Launch</strong> you should be prompted to select a keypair, pick workshop, check the checkbox and click <strong>Launch Instances</strong>, It should take ~ a minute for your instance to get up and running.</p></li>
+</ul>
+
+
+
+<h3 id="step-3-install-aws-codedeploy">Step 3 - Install AWS CodeDeploy</h3>
+
+<ul>
+<li>Find the <em>Public IP address</em> for your instance from the instance dashboard</li>
+<li>SSH onto your newly instantiated EC2 instance <br>
+<ul><li><code>ssh -i ~/.ssh/workshop.pem ec2-user@EC2_PUBLIC_IP</code></li></ul></li>
+<li>Download and install AWS CodeDeploy <br>
+<ul><li><code>sudo yum update</code> - this may take a couple of minutes to complete</li>
+<li><code>wget https://aws-codedeploy-eu-west-1.s3.amazonaws.com/latest/install</code></li>
+<li><code>chmod +x ./install</code></li>
+<li><code>sudo ./install auto</code></li></ul></li>
+</ul>
+
+
+
+<h3 id="step-4-setup-codedeploy">Step 4 - Setup CodeDeploy</h3>
+
+<ul>
+<li>Navigate to <a href="https://eu-west-1.console.aws.amazon.com/codedeploy/home?region=eu-west-1#/applications"><em>CodeDeploy</em></a></li>
+<li>Select <strong>Create New Application</strong></li>
+<li>You can name your application and deployment group whatever you want</li>
+<li>Now select Key:<em>Name</em> and Value:<em>sb-workshop</em> under Tags</li>
+<li>Set <em>Deployment Config</em> to any value, it shouldn’t make a difference because we on have 1 instance</li>
+<li>Select cd-role for the <em>Service Role ARN</em> (it will be prefix with a long string)</li>
+<li>Click <strong>Create Application</strong></li>
+</ul>
+
+
+
+<h3 id="step-5-deploying-code">Step 5 - Deploying code</h3>
+
+<p>For your own application this step should be repeated everytime you wish to push new changes.  In this workshop I am only explaining how to deploycode manually each time using the webconsole. If you had more time you could set up AWS command line tools to trigger deployments or set up GitHub hooks so that your code is deployed each time you pushed to master. But seeing as there is only 24 to develop your application neither of these things have much value.</p>
+
+<p><img src="http://i.imgur.com/ndFBx8k.png" alt="Where to find deployments" title=""></p>
+
+<ul>
+<li>Select deployments as shown above and click <strong>Create New Deployment</strong></li>
+<li>Select your <em>Application</em> and your <em>Deployment Group</em></li>
+<li>Check <em>My application is stored in GitHub</em>, a <strong>Connect with GitHub</strong> but should appear, click it and sign in to GitHub.</li>
+<li>Now enter <em>CaffeinatedDave/cloud-deploy-demo</em> as the Repository Name</li>
+<li>Go to GitHub and get the latest full length commit hash, for this demo it is <em>59f225a15a9e7bbc5b68a55f17d78d672a797e4a</em> (This may well get outdated if I forget to update it)</li>
+<li>Select any Deployment Config option as in step 4</li>
+<li>Hit <strong>Deploy Now</strong></li>
+</ul>
+
+
+
+<h3 id="step-6-debugging-problems">STEP 6 - Debugging problems</h3>
+
+<ul>
+<li>You should be taken back to a list of deployments, each deployment is given a random name, click on the name od the deployment at the top of the list</li>
+<li>You should see the status of the Deployment (hopefully is says Successfull)</li>
+<li>At the bottom of the page is a list of all instances that have been deployed to, in this workshop we only deployed to 1.</li>
+<li>On the right of the instance is a link to <em>View Events</em>, this lists out each step and whether it was successful. If it wasn’t successful then a link to view the error log will exist.</li>
+</ul>
+
+
+
+<h4 id="so-how-does-aws-know-what-to-do">So how does AWS know what to do</h4>
+
+<p>Instructions on how to deploy the application are held in a file called <code>app-spec.yaml</code> in the git repo</p>
+
+<p>I will breifly explain what each part of the app-spec does, for more information see the <a href="http://docs.aws.amazon.com/codedeploy/latest/userguide/app-spec-ref.html">appspec user guide</a></p>
+
+<p>Here is the appspec used to deploy this project.</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs haml">version: 0.0
+os: linux
+files:
+  -<span class="ruby"> <span class="hljs-symbol">source:</span> /<span class="hljs-constant">Gemfile</span>
+</span>    destination: /opt/ruby-app
+  -<span class="ruby"> <span class="hljs-symbol">source:</span> /<span class="hljs-constant">Gemfile</span>.lock
+</span>    destination: /opt/ruby-app
+  -<span class="ruby"> <span class="hljs-symbol">source:</span> /public
+</span>    destination: /opt/ruby-app/public
+  -<span class="ruby"> <span class="hljs-symbol">source:</span> /views
+</span>    destination: /opt/ruby-app/views
+  -<span class="ruby"> <span class="hljs-symbol">source:</span> /web.rb
+</span>    destination: /opt/ruby-app
+hooks:
+  BeforeInstall:
+    -<span class="ruby"> <span class="hljs-symbol">location:</span> scripts/install_dependencies
+</span>      timeout: 300
+      runas: ec2-user
+  AfterInstall:
+    -<span class="ruby"> <span class="hljs-symbol">location:</span> scripts/setup_app
+</span>      timeout: 300
+      runas: ec2-user
+  ApplicationStart:
+    -<span class="ruby"> <span class="hljs-symbol">location:</span> scripts/start_server
+</span>      timeout: 300
+      runas: ec2-user
+  ApplicationStop:
+    -<span class="ruby"> <span class="hljs-symbol">location:</span> scripts/stop_server
+</span>      timeout: 300
+      runas: ec2-user</code></pre>
+
+<p><strong>version</strong> - This is for the version of the appspec format, currently there is only 1 version <code>0.0.0</code></p>
+
+<p><strong>os</strong> - Specifies what OS the application should run on can be either <code>linux</code> or <code>windows</code></p>
+
+<p><strong>files</strong> - These are simple rules which run during the Install hook(see below for an explanation of hooks). It specifies which files and directories should be copied from the repository to the server and where they should be copied to.</p>
+
+<p><strong>permissions</strong> - Although not used in this project if specific permissions need to be set for files then they should be specified in here. See the <a href="http://docs.aws.amazon.com/codedeploy/latest/userguide/app-spec-ref.html#http://docs.aws.amazon.com/codedeploy/latest/userguide/app-spec-ref.html#d0e30313">appspec user guide</a> for more infomation.</p>
+
+<p><strong>hooks</strong>: These specify bash scripts that should be run and which user they should be run as. The timeout is how long CodeDeploy should wait before failing the deployment in seconds. See below for more infomation on hooks.</p>
+
+
+
+<h4 id="hooks">Hooks</h4>
+
+<p>Code deployment is split into a 7 Steps, 5 user defined and 2 process defined.</p>
+
+<p><img src="http://docs.aws.amazon.com/codedeploy/latest/userguide/images/app_hooks.png" alt="hook diagram" title=""></p>
+
+<ol>
+<li><strong>ApplicationStop</strong> - this is the first step. In this step you should stop your application from running and delete any temporary data you don’t need.</li>
+<li><strong>DownloadBundle</strong> - This event copies files to a temporary directory on the EC2 instance. This event is reserved for the AWS CodeDeploy agent and cannot be used to run scripts.</li>
+<li><strong>BeforeInstall</strong> – You can use this deployment lifecycle event for preinstall tasks, such as installing dependencies.</li>
+<li><strong>Install</strong> - During this deployment lifecycle event, the AWS CodeDeploy agent copies the revision files from the temporary location to the final destination folder. This event is reserved for the AWS CodeDeploy agent and cannot be used to run scripts.</li>
+<li><strong>AfterInstall</strong> - You can use this deployment lifecycle event for tasks such as configuring your application and downloading dependencies listed in the application.</li>
+<li><strong>ApplicationStart</strong> – You typically use this deployment lifecycle event to restart services that were stopped during ApplicationStop.</li>
+<li><strong>ValidateService</strong> – This is the last deployment lifecycle event. It should be used to verify the deployment was completed successfully.</li>
+</ol>
+
+
+
+<h4 id="more-reading">More Reading</h4>
+
+<ul>
+<li><a href="http://docs.aws.amazon.com/codedeploy/latest/userguide/troubleshooting.html">CloudDeploy troubleshooting guide</a></li>
+<li><a href="http://docs.aws.amazon.com/codedeploy/latest/userguide/app-spec-ref.html">appspec.yaml Reference guide</a></li>
+</ul>
