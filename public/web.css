@@ -22,6 +22,16 @@ body {
   -o-background-size: cover;
   background-size: cover;
   background-attachment: fixed;
+  line-height: 1.2em;
+}
+
+.code {
+  block: inline;
+  background-color: #eee;
+  border: 1px solid #0d2d6c;
+  padding: 0.2em;
+  font-size: 0.8em;
+  white-space:nowrap;
 }
 
 #topbar {
@@ -48,7 +58,7 @@ body {
 }
 
 #page {
-
+  padding: 10px;
   padding-top: 5em;
   width:65%;
   margin: 0 auto;
